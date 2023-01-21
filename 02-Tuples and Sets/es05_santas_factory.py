@@ -14,19 +14,29 @@ crafted_presents = {}
 is_crafted = False
 
 while materials and magic_level:
+
+    # print(f"Materials: {materials}")
+    # print(f"Magic Level: {magic_level}")
+    # print(f"First Material: {materials[0]}")
+    # print(f"Last Magic: {magic_level[len(magic_level) - 1]}")
+    # print("----------")
+
+    # if materials[len(materials) - 1] == 0 or magic_level[0] == 0:
+    #     if materials[len(materials) - 1] == 0 and magic_level[0] != 0:
+    #         materials.pop()
+    #         continue
+    #     elif materials[0] != 0 and magic_level[len(magic_level) - 1] == 0:
+    #         magic_level.popleft()
+    #         continue
+    #     else:
+    #         materials.pop()
+    #         magic_level.popleft()
+    #         continue
+
     last_material = materials.pop()
     first_magic = magic_level.popleft()
 
     total_magic_level = last_material * first_magic
-
-    if last_material == 0 and first_magic == 0:
-        continue
-    elif last_material == 0:
-        magic_level.appendleft(first_magic)
-        continue
-    elif first_magic == 0:
-        materials.append(last_material)
-        continue
 
     if total_magic_level in present_table.keys():
         current_present = present_table[total_magic_level]
@@ -34,30 +44,32 @@ while materials and magic_level:
             crafted_presents[current_present] = 0
 
         crafted_presents[current_present] += 1
-    elif total_magic_level < 0:
-        materials.append(last_material + first_magic)
-    elif total_magic_level > 0:
-        last_material += 15
-        materials.append(last_material)
+    else:
+        if total_magic_level < 0:
+            sum_values = last_material + first_magic
+            materials.append(sum_values)
+
+        if total_magic_level > 0:
+            last_material += 15
+            materials.append(last_material)
+
+        if total_magic_level == 0:
+            if last_material != 0:
+                materials.append(last_material)
+
+            if first_magic != 0:
+                magic_level.appendleft(first_magic)
 
 first_set = {"Doll", "Wooden train"}
 second_set = {"Teddy bear", "Bicycle"}
 
-# print(first_set)
-# print(second_set)
-# print(set(present_table.values()))
-# print(first_set.issubset(set(present_table.values())))
-
 if first_set.issubset(set(crafted_presents.keys())) or second_set.issubset(set(crafted_presents.keys())):
     is_crafted = True
-# is_crafted = True if first_set.issubset(set(present_table.values())) or second_set.issubset(set(present_table.values())) else False
 
 presents_message = "The presents are crafted! Merry Christmas!" if is_crafted else "No presents this Christmas!"
 print(presents_message)
 
-materials.reverse()
+print(f"Materials left: {', '.join([str(material) for material in materials][::-1])}") if materials else ''
+print(f"Magic left: {', '.join(str(el) for el in magic_level)}") if magic_level else ''
 
-print(f"Materials left: {', '.join(map(str, materials))}") if materials else ''
-print(f"Magic left: {', '.join(map(str, magic_level))}") if magic_level else ''
-
-[print(f"{key}: {value}") for key, value in crafted_presents.items()]
+[print(f"{key}: {value}") for key, value in sorted(crafted_presents.items())]
